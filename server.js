@@ -1,20 +1,23 @@
 const express = require("express");
 const app = express();
-const http = require("http").createServer(app);
-const io = require("socket.io")(http);
+const http = require("http");
+const server = http.createServer(app);
+const { Server } = require("socket.io");
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
-});
+const io = new Server(server);
+
+app.use(express.static(__dirname));
 
 io.on("connection", (socket) => {
-  console.log("a user connected");
+  
+console.log("user connected");
 
-  socket.on("chat message", (msg) => {
-    io.emit("chat message", msg);
-  });
+socket.on("chat message", (msg) => {
+io.emit("chat message", msg);
 });
 
-http.listen(3000, () => {
-  console.log("Server started on port 3000");
+});
+
+server.listen(3000, () => {
+console.log("server started");
 });
