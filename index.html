@@ -2,66 +2,120 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Простий чат</title>
+<title>Онлайн чат</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f0f0f0;
-    margin: 20px;
-  }
-  #chat-container {
-    max-width: 500px;
-    margin: auto;
-  }
-  ul#messages {
-    list-style: none;
-    padding: 0;
-    max-height: 300px;
-    overflow-y: scroll;
-    border: 1px solid #ccc;
-    background: #fff;
-    margin-bottom: 10px;
-  }
-  ul#messages li {
-    padding: 5px 10px;
-    border-bottom: 1px solid #eee;
-  }
-  #input {
-    width: 70%;
-    padding: 10px;
-    font-size: 16px;
-  }
-  button {
-    padding: 10px;
-    font-size: 16px;
-  }
+body {
+  font-family: Arial, sans-serif;
+  background: #d3d3d3; /* сірий фон */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+}
+#chat-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  width: 100%;
+  height: 100%;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+}
+#messages {
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+#messages li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+.message-text {
+  background: #e0e0e0;
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+#input-container {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+}
+#input {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+button {
+  margin-left: 10px;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+button:hover {
+  background: #45a049;
+}
 </style>
 </head>
 <body>
-
 <div id="chat-container">
   <ul id="messages"></ul>
-  <input id="input" autocomplete="off" placeholder="Напиши повідомлення">
-  <button onclick="send()">Відправити</button>
+  <div id="input-container">
+    <input id="input" placeholder="Напиши повідомлення">
+    <button onclick="send()">Відправити</button>
+  </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
 var socket = io();
 
-function send(){
+// Генеруємо аватарку (випадковий колір) і нік
+var userColor = "#" + Math.floor(Math.random()*16777215).toString(16);
+var userAvatar = "https://api.dicebear.com/6.x/identicon/svg?seed=" + Math.floor(Math.random()*1000);
+
+function send() {
   let input = document.getElementById("input");
   if(input.value.trim() === "") return;
-  socket.emit("chat message", input.value);
-  input.value="";
+  socket.emit("chat message", { text: input.value, color: userColor, avatar: userAvatar });
+  input.value = "";
 }
+
+// Надсилання по Enter
+document.getElementById("input").addEventListener("keydown", function(e){
+  if(e.key === "Enter") send();
+});
 
 socket.on("chat message", function(msg){
   let li = document.createElement("li");
-  li.textContent = msg;
+  let avatar = document.createElement("img");
+  avatar.src = msg.avatar;
+  avatar.className = "avatar";
+  let text = document.createElement("div");
+  text.textContent = msg.text;
+  text.className = "message-text";
+  text.style.background = msg.color + "30"; // легкий відтінок кольору
+  li.appendChild(avatar);
+  li.appendChild(text);
   document.getElementById("messages").appendChild(li);
+  // Скрол вниз
+  document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
 });
 </script>
-
 </body>
 </html>
