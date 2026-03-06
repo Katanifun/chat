@@ -137,3 +137,22 @@ display:none;
 
 const socket = io();
 
+<script>
+
+const socket = io();
+
+function sendMessage();
+
+const input =
+document.getElementByld("messageInput");
+const message + input.value;
+
+if(message.trim() === "") return;
+
+socket.emit("chat message", message);
+
+input.value = "";
+
+  }
+
+</sript>
