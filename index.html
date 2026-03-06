@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Простий чат</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f0f0;
+    margin: 20px;
+  }
+  #chat-container {
+    max-width: 500px;
+    margin: auto;
+  }
+  ul#messages {
+    list-style: none;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: scroll;
+    border: 1px solid #ccc;
+    background: #fff;
+    margin-bottom: 10px;
+  }
+  ul#messages li {
+    padding: 5px 10px;
+    border-bottom: 1px solid #eee;
+  }
+  #input {
+    width: 70%;
+    padding: 10px;
+    font-size: 16px;
+  }
+  button {
+    padding: 10px;
+    font-size: 16px;
+  }
+</style>
+</head>
+<body>
+
+<div id="chat-container">
+  <ul id="messages"></ul>
+  <input id="input" autocomplete="off" placeholder="Напиши повідомлення">
+  <button onclick="send()">Відправити</button>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+var socket = io();
+
+function send(){
+  let input = document.getElementById("input");
+  if(input.value.trim() === "") return;
+  socket.emit("chat message", input.value);
+  input.value="";
+}
+
+socket.on("chat message", function(msg){
+  let li = document.createElement("li");
+  li.textContent = msg;
+  document.getElementById("messages").appendChild(li);
+});
+</script>
+
+</body>
+</html>
