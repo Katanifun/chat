@@ -3,156 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <title>Chat</title>
-
 <style>
-
-body{
-margin:0;
-font-family:Arial;
-display:flex;
-height:100vh;
-background:#e4e4e4;
-}
-
-.sidebar{
-width:250px;
-background:#2f2f2f;
-color:white;
-padding:10px;
-}
-
-.chat-container{
-flex:1;
-display:flex;
-flex-direction:column;
-}
-
-.messages{
-flex:1;
-overflow-y:auto;
-padding:20px;
-}
-
-.message{
-display:flex;
-margin-bottom:10px;
-}
-
-.avatar{
-width:40px;
-height:40px;
-border-radius:50%;
-background:#777;
-margin-right:10px;
-}
-
-.bubble{
-background:white;
-padding:10px;
-border-radius:10px;
-}
-
-.input-area{
-display:flex;
-padding:10px;
-background:#ddd;
-}
-
-#messageInput{
-flex:1;
-padding:10px;
-}
-
-button{
-padding:10px;
-margin-left:5px;
-}
-
-.settings{
-position:fixed;
-right:20px;
-top:20px;
-background:white;
-padding:15px;
-border-radius:10px;
-display:none;
-}
-
+body{margin:0;font-family:Arial;display:flex;height:100vh;background:#e4e4e4;}
+.sidebar{width:250px;background:#2f2f2f;color:white;padding:10px;}
+.chat-container{flex:1;display:flex;flex-direction:column;}
+.messages{flex:1;overflow-y:auto;padding:20px;}
+.message{display:flex;margin-bottom:10px;}
+.avatar{width:40px;height:40px;border-radius:50%;background:#777;margin-right:10px;}
+.bubble{background:white;padding:10px;border-radius:10px;}
+.input-area{display:flex;padding:10px;background:#ddd;}
+#messageInput{flex:1;padding:10px;}
+button{padding:10px;margin-left:5px;}
+.settings{position:fixed;right:20px;top:20px;background:white;padding:15px;border-radius:10px;display:none;}
 </style>
-
 </head>
-
 <body>
 
 <div class="sidebar">
-
-<h3>Чаты</h3>
-
+<h3>Чати</h3>
 <div>Общий чат</div>
-<div>Друзья</div>
-
+<div>Друзі</div>
 <br>
-
-<button onclick="openSettings()">⚙ Настройки</button>
-
+<button onclick="openSettings()">⚙ Налаштування</button>
 </div>
 
 <div class="chat-container">
-
 <div id="messages" class="messages"></div>
-
 <div class="input-area">
-<input id="messageInput" placeholder="Сообщение">
-<button onclick="sendMessage()">Отправить</button>
+<input id="messageInput" placeholder="Написати повідомлення...">
+<button onclick="sendMessage()">Відправити</button>
 </div>
-
 </div>
 
 <div class="settings" id="settings">
-
-<h3>Настройки</h3>
-
-Ник:<br>
+<h3>Налаштування</h3>
+Нік:<br>
 <input id="nameInput"><br><br>
-
 Аватарка URL:<br>
 <input id="avatarInput"><br><br>
-
 Тема:<br>
-
 <select id="themeSelect">
-<option value="light">Светлая</option>
-<option value="dark">Темная</option>
+<option value="light">Світла</option>
+<option value="dark">Темна</option>
 </select>
-
 <br><br>
-
-<button onclick="saveSettings()">Сохранить</button>
-
+<button onclick="saveSettings()">Зберегти</button>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
-
 <script>
-
 const socket = io();
 
-<script>
+// Завантажуємо нік та аватарку з localStorage
+let username = localStorage.getItem("name") || "User";
+let avatar = localStorage.getItem("avatar") || "";
 
-const socket = io();
+const messages = document.getElementById("messages");
+const input = document.getElementById("messageInput");
 
-function sendMessage();
+function sendMessage(){
+  const text = input.value;
+  if(text.trim() === "") return;
 
-const input =
-document.getElementByld("messageInput");
-const message + input.value;
+  socket.emit("chat message", {name: username, text: text, avatar: avatar});
+  input.value = "";
+}
 
-if(message.trim() === "") return;
+socket.on("chat message", function(data){
+  const msg = document.createElement("div");
+  msg.className = "message";
+  msg.innerHTML = 
+  <img class="avatar" src="${data.avatar || 'https://i.imgur.com/HeIi0wU.png'}">
+  <div class="bubble"><b>${data.name}</b><br>${data.text}</div>
+  ;
+  messages.appendChild(msg);
+  messages.scrollTop = messages.scrollHeight;
+});
 
-socket.emit("chat message", message);
+input.addEventListener("keypress", function(e){
+  if(e.key === "Enter") sendMessage();
+});
 
-input.value = "";
+// Відкриття вікна налаштувань
+function openSettings(){
+  document.getElementById("settings").style.display = "block";
+  document.getElementById("nameInput").value = username;
+  document.getElementById("avatarInput").value = avatar;
+}
 
-  }
+// Збереження налаштувань
+function saveSettings(){
+  username = document.getElementById("nameInput").value || "User";
+  avatar = document.getElementById("avatarInput").value || "";
+  localStorage.setItem("name", username);
+  localStorage.setItem("avatar", avatar);
 
-</sript>
+  const theme = document.getElementById("themeSelect").value;
+  document.body.style.background = (theme === "dark") ? "#222" : "#e4e4e4";
+
+  alert("Збережено!");
+  document.getElementById("settings").style.display = "none";
+}
+</script>
+
+</body>
+</html>
