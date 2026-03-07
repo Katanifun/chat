@@ -72,10 +72,10 @@ function sendMessage(){
 socket.on("chat message", function(data){
   const msg = document.createElement("div");
   msg.className = "message";
-  msg.innerHTML = 
-  <img class="avatar" src="${data.avatar || 'https://i.imgur.com/HeIi0wU.png'}">
-  <div class="bubble"><b>${data.name}</b><br>${data.text}</div>
-  ;
+  msg.innerHTML = `
+<img class="avatar" src="${data.avatar || 'https://i.imgur.com/HeIi0wU.png'}">
+<div class="bubble"><b>${data.name}</b><br>${data.text}</div>
+`;
   messages.appendChild(msg);
   messages.scrollTop = messages.scrollHeight;
 });
@@ -108,3 +108,4 @@ function saveSettings(){
 
 </body>
 </html>
+
